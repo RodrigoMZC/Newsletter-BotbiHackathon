@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('category')->notNullable()->index();
             $table->text('description')->notNullable();
             $table->longText('content')->notNullable();
-            $table->string('url')->unique(); // url a la noticia original
-            $table->string('image');
+            $table->text('url'); // url a la noticia original
+            $table->text('image');
             $table->dateTimeTz('published_at')->index();
             $table->decimal('score', 2, 1)->unsigned();
             $table->timestamps();
