@@ -1,12 +1,16 @@
 import { useLocalSearchParams } from "expo-router";
-import { Text, View } from "react-native";
+import {ScrollView, Text, View} from "react-native";
+import {SafeAreaView} from "react-native-safe-area-context";
 
 const Article = () => {
     const { id } =useLocalSearchParams()
   return (
-    <View>
-      <Text>Articulo {id}.</Text>
-    </View>
+    <SafeAreaView className='h-full'>
+      <View>
+        <Text>Id {id}</Text>
+      </View>
+
+    </SafeAreaView>
   );
 }
 

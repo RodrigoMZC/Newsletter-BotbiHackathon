@@ -18,7 +18,7 @@ const Search = () => {
   }
 
   return (
-    <View className="flex flex-row items-center justify-between w-full px-4 pt-4 rounded-lg bg-accent-100 border border-primary-100">
+    <View className="flex flex-row items-center justify-between w-full py-2 px-2 rounded-lg bg-accent-100 border border-primary-100">
       <View className="flex-1 flex flex-row items-center justify-start z-50">
         <Image
           source={icons.search}
@@ -28,6 +28,7 @@ const Search = () => {
           value={search}
           onChangeText={handleSearch}
           placeholder="Search for anything"
+          placeholderTextColor="#8C8E98"
           className="text-sm font-rubik text-black-300 ml-2 flex-1"
         />
       </View>

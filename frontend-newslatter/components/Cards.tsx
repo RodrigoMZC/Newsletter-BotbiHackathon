@@ -89,7 +89,7 @@ export const ArticleCard = ({onPress, title, description, image, publishedAt}: P
           {title}
         </Text>
         <Image
-          source={image}
+          source={image ? {uri: image}: images.japan}
           className='w-full h-48 rounded-md'
           resizeMode="cover"
         />
