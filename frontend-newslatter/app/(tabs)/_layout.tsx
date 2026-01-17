@@ -5,7 +5,7 @@ import icons from "@/constants/icons";
 const TabIcon = ({ focused, icon, title}: { focused: boolean; icon: any; title: string;}) => (
   <View className="flex-1 mt-3 flex flex-col items-center">
     <Image
-      tintColor={focused ? '#0061FF' : '#666876'}
+      tintColor={focused ? '#E11D48' : '#666876'}
       source={icon}
       resizeMode="contain"
       className="size-6"
