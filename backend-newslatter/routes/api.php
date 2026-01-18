@@ -6,3 +6,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/news', [NewsApiController::class, 'index']);
 Route::post('/subscribe', [SubscriberApiController::class, 'store']);
+Route::post('/news/refresh', [NewsApiController::class, 'refresh']);

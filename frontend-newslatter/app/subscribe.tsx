@@ -1,4 +1,14 @@
-import {View, Text, ScrollView, Image, TouchableOpacity, Alert, ActivityIndicator, TextInput} from 'react-native'
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  TextInput,
+  KeyboardAvoidingView, Platform
+} from 'react-native'
 import React, {useState} from 'react';
 import images from "@/constants/images";
 import {Redirect, useRouter} from "expo-router";
@@ -42,16 +52,12 @@ const Subscribe = ({ onLoginSuccess }: Props) => {
 
     setLoading(true);
     try {
-      // 1. Backend
+      // backend
       const response = await SubscribersService.subscribe(name, email);
 
-      console.log("Respuesta Backend:", response);
+      if (!response) throw new Error("La respuesta del servidor no contiene datos de usuario");
 
-      const userToSave = response.data || response;
-
-      if (!userToSave) throw new Error("La respuesta del servidor no contiene datos de usuario");
-
-      // 2. Guardar sesión
+      // guardar sesión
       await handleSuccess(response);
     } catch (error: any) {
       Alert.alert("Error", error.message || "No se pudo conectar con el servidor");
@@ -61,10 +67,15 @@ const Subscribe = ({ onLoginSuccess }: Props) => {
   };
 
   return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className='flex-1'
+    >
       <ScrollView
         className='flex-1'
         contentContainerClassName='pb-20'
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <Image
           source={images.onboarding}
@@ -85,13 +96,12 @@ const Subscribe = ({ onLoginSuccess }: Props) => {
             <Text className="text-primary-300">Noticias al instante</Text>
           </Text>
 
-          {/* Formulario Manual */}
+          {/* formulario */}
           <View className="space-y-4">
             <View>
               <Text className="text-black-200 font-rubik-medium mb-2">Nombre Completo</Text>
               <TextInput
                 className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-black-300 font-rubik"
-                placeholder="Ej. Juan Pérez"
                 value={name}
                 onChangeText={setName}
               />
@@ -100,10 +110,10 @@ const Subscribe = ({ onLoginSuccess }: Props) => {
               <Text className="text-black-200 font-rubik-medium mb-2">Correo Electrónico</Text>
               <TextInput
                 className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-black-300 font-rubik"
-                placeholder="juan@ejemplo.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
+
                 onChangeText={setEmail}
               />
             </View>
@@ -133,6 +143,7 @@ const Subscribe = ({ onLoginSuccess }: Props) => {
           <GoogleLogin onLoginSuccess={onLoginSuccess} />*/}
         </View>
       </ScrollView>
+    </KeyboardAvoidingView>
   )
 }
 export default Subscribe

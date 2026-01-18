@@ -4,7 +4,7 @@ import {
   Dimensions,
   FlatList,
   Image, NativeScrollEvent,
-  NativeSyntheticEvent,
+  NativeSyntheticEvent, RefreshControl,
   ScrollView,
   Text,
   View
@@ -43,6 +43,15 @@ export default function Index() {
   const [isLoading, setIsLoading] =useState(true);
 
   const [user, setUser] = useState<any>(null)
+
+  const [refreshing, setRefreshing] = useState(false)
+
+  const onRefresh = async  () => {
+    setRefreshing(true);
+    await loadNews();
+    setRefreshing(false)
+
+  }
 
   const loadNews = async () => {
     setIsLoading(true);
@@ -104,6 +113,13 @@ export default function Index() {
         style={{width}}
         showsVerticalScrollIndicator={false}
         bounces={true}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor= '#E11D48'
+          />
+        }
       >
         <View style={{ width }} className='px-4'>
          <View className='my-4 flex-col justify-center items-center'>

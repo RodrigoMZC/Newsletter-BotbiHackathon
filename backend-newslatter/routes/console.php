@@ -2,4 +2,6 @@
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('news:fetch')->dailyAt('08:00');
+//Schedule::command('news:fetch')->dailyAt('08:00');
+Schedule::command('news:fetch')->hourly();
+Schedule::command('news:daily-mail')->dailyAt('08:00');

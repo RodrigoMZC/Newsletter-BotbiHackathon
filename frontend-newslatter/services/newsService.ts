@@ -43,5 +43,24 @@ export const NewsService = {
     if (article) return article;
 
     return null
+  },
+
+  refreshNews: async (): Promise<Article[]> => {
+    try {
+      const response = await fetch(`${API_URL}/news/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      })
+
+      if (!response.ok) throw new Error('Error actualizando noticias');
+
+      return await response.json()
+    } catch (e) {
+      console.error('Error en refetch')
+      return []
+    }
   }
 }
