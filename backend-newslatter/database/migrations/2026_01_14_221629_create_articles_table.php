@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('url'); // url a la noticia original
             $table->text('image');
             $table->dateTimeTz('published_at')->index();
-            $table->decimal('score', 2, 1)->unsigned();
+            $table->integer('score')->unsigned();
             $table->timestamps();
         });
     }

@@ -13,7 +13,7 @@ class GNewsService {
         $response = Http::get($url, [
             'category' => $category,
             'lang' => 'es',
-            'max' => 5,
+            'max' => 10,
             'apikey' => $key
         ]);
 
