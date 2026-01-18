@@ -1,11 +1,11 @@
 <?php
 
 use App\Mail\DailyNews;
+use App\Mail\Welcome;
 use App\Models\Article;
 use App\Services\GNewsService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
-
 
 Route::get('/test', function () {
     $service = new GNewsService();
@@ -22,13 +22,19 @@ Route::get('/preview-news', function () {
     return view('emails.dailyNews', ['news' => $news]);
 });
 
+Route::get('/preview-news', function () {
+    $news = Article::latest('published_at')->take(3)->get();
+
+    return view('emails.welcome', ['news' => $news]);
+});
+
 Route::get('/send-test', function () {
     $news = Article::latest('published_at')->take(3)->get();
 
     $address = '...';
 
     try {
-        Mail::to($address)->send(new DailyNews($news));
+        Mail::to($address)->send(new Welcome($news));
         return "Correo enviado a $address.";
     } catch (Exception $e) {
         return "Error: " . $e->getMessage();

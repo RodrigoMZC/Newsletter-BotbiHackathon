@@ -15,8 +15,9 @@ import Search from "@/components/Search";
 import {ArticleCard} from "@/components/Cards";
 import TopTab, {TabItem} from "@/components/TopTab";
 import {useEffect, useRef, useState} from "react";
-import {useLocalSearchParams, useRouter} from "expo-router";
+import {Link, useLocalSearchParams, useRouter} from "expo-router";
 import {Article, NewsService} from "@/services/newsService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const navTabs = [
   { name: 'Tecnología', id: 'technology' },
@@ -41,6 +42,8 @@ export default function Index() {
   const [news, setNews] = useState<Article[]>([]);
   const [isLoading, setIsLoading] =useState(true);
 
+  const [user, setUser] = useState<any>(null)
+
   const loadNews = async () => {
     setIsLoading(true);
     const data = await NewsService.getAll();
@@ -50,7 +53,19 @@ export default function Index() {
 
   useEffect(() => {
     loadNews()
+    checkUser()
   }, [])
+
+  const checkUser = async () => {
+    try {
+      const session = await AsyncStorage.getItem('user_session');
+      if (session) {
+        setUser(JSON.parse(session));
+      }
+    } catch (e) {
+      console.log("Entrando como invitado");
+    }
+  };
 
   /*const getFilteredNews = () => {
     // en el tab de today saldran todas las noticias
@@ -127,12 +142,12 @@ export default function Index() {
             {/* Header info de usuario  */}
             <View className='flex flex-row'>
               <Image
-                source={ images.avatar }
+                source={ user?.avatar ? { uri: user.avatar } : images.avatar }
                 className='size-12 rounded-full'
               />
               <View className='flex flex-col items-start ml-2 justify-center'>
                 <Text className='text-xs font-rubik text-black-100'>Buen dia</Text>
-                <Text className='text-base font-rubik-medium text-black-300'>BIBIGO</Text>
+                <Text className='text-base font-rubik-medium text-black-300'>{user ? user.name : "Invitado"}</Text>
               </View>
             </View>
             <Image
