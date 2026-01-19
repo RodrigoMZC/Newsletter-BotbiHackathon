@@ -163,9 +163,15 @@ export default function Index() {
     return (
       <View style={{ width }} className='px-4'>
         <View className='my-4 flex-col justify-center items-center'>
-          <Text className='text-xl font-rubik-bold text-black-300 capitalize'>
-            {item.id === 'today' ? 'Noticias Destacadas' : item.name}
-          </Text>
+          {item.id === 'top10' ? (
+            <View className="flex-row items-center gap-2">
+              <Text className='text-2xl font-rubik-bold text-primary-300 uppercase tracking-widest'>TOP 10 DEL DÍA</Text>
+            </View>
+          ) : (
+            <Text className='text-xl font-rubik-bold text-black-300 capitalize'>
+              {item.name}
+            </Text>
+          )}
         </View>
 
         <FlatList
@@ -173,6 +179,7 @@ export default function Index() {
           keyExtractor={(item, index) => `${item.id}-${index}`}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 80 }}
+          onEndReached={item.id !== 'top10' ? loadMore : null}
           onEndReachedThreshold={0.5}
           renderItem={({ item: newsItem, index }) => (
             <View className={index !== 0 ? 'my-6 border-t border-primary-200' : ''}>
