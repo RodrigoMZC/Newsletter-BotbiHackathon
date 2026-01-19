@@ -76,6 +76,20 @@ const TabsLayout = () => {
           )
         }}
       />
+      <Tabs.Screen
+        name="markets"
+        options={{
+          title: 'Market',
+          headerShown: false,
+          tabBarIcon: ({focused}) => (
+            <TabIcon
+              icon={icons.search}
+              focused={focused}
+              title="Market"
+            />
+          )
+        }}
+      />
     </Tabs>
   )
 }

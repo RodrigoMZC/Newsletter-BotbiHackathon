@@ -20,6 +20,7 @@ import {Article, NewsService} from "@/services/newsService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const navTabs = [
+  { name: 'Top 10', id: 'top10' },
   { name: 'Tecnología', id: 'technology' },
   { name: 'Hoy', id: 'today' }, // "Variadas" al entrar
   { name: 'Negocios', id: 'business' },
@@ -29,7 +30,7 @@ const { width } = Dimensions.get('window');
 
 export default function Index() {
   // para el router
-  const { category } = useLocalSearchParams()
+  const { category } = useLocalSearchParams<{category: string}>()
   const router = useRouter()
   const flatListRef = useRef<FlatList>(null);
 
@@ -41,36 +42,86 @@ export default function Index() {
   // estados para los articulos
   const [news, setNews] = useState<Article[]>([]);
   const [isLoading, setIsLoading] =useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [user, setUser] = useState<any>(null)
 
-  const [refreshing, setRefreshing] = useState(false)
+  //const [refreshing, setRefreshing] = useState(false)
 
-  const onRefresh = async  () => {
+  /*const onRefresh = async  () => {
     setRefreshing(true);
     await loadNews();
     setRefreshing(false)
+  }*/
 
+  const fetchNews = async (page: number, isRefresh = false) => {
+    if (currentCategory === 'top10') {
+      if (!isRefresh && news.length > 0) return; // Ya cargado
+      setIsLoading(true);
+      const data = await NewsService.getTopTen();
+      setNews(data);
+      setHasMore(false);
+      setIsLoading(false);
+      setRefreshing(false);
+      return;
+    }
+
+    if (!isRefresh && page > 1 && !hasMore) return;
+
+    if (page === 1 && !isRefresh) setIsLoading(true)
+    if (page > 1) setIsLoadingMore(true);
+
+    try {
+      const data = await NewsService.getAll(page);
+      if (data.length < 10) setHasMore(false);
+
+      if (page === 1) {
+        setNews(data);
+        if (data.length < 10) setHasMore(false);
+        else setHasMore(true);
+      } else {
+        setNews(prev => [...prev, ...data]);
+      }
+
+    } catch (error) {
+      console.error("Error cargando noticias:", error);
+      setHasMore(false);
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+      setRefreshing(false);
+    }
   }
 
-  const loadNews = async () => {
+  const loadMore = () => {
+    if (!isLoading && !isLoadingMore && hasMore && !refreshing) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchNews(nextPage)
+    }
+  }
+
+  /*const loadNews = async () => {
     setIsLoading(true);
     const data = await NewsService.getAll();
     setNews(data)
     setIsLoading(false)
-  }
+  }*/
 
   useEffect(() => {
-    loadNews()
+    fetchNews(1)
     checkUser()
   }, [])
 
+  // manejo de sesiones
   const checkUser = async () => {
     try {
       const session = await AsyncStorage.getItem('user_session');
-      if (session) {
-        setUser(JSON.parse(session));
-      }
+      if (session) setUser(JSON.parse(session));
+
     } catch (e) {
       console.log("Entrando como invitado");
     }
@@ -104,48 +155,46 @@ export default function Index() {
   }
 
   const renderTabContent = ({ item }: { item: TabItem }) => {
-    const safeNews = Array.isArray(news) ? news : [];
     const filteredNews = item.id === 'today'
-      ? safeNews : safeNews.filter(newsItem => newsItem.category?.toLowerCase() === item.id)
+      ? news : news.filter(newsItem => newsItem.category?.toLowerCase() === item.id)
+
+    const dataToShow = news;
 
     return (
-      <ScrollView
-        style={{width}}
-        showsVerticalScrollIndicator={false}
-        bounces={true}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor= '#E11D48'
-          />
-        }
-      >
-        <View style={{ width }} className='px-4'>
-         <View className='my-4 flex-col justify-center items-center'>
-           <Text className='text-xl font-rubik-bold text-black-300 capitalize'>
-             {item.id === 'today' ? 'Noticias Destacadas' : item.name}
-           </Text>
-         </View>
-
-         <View className='pb-32'>
-           {filteredNews?.map((newsItem, i) => (
-             <View
-              key={newsItem.id}
-              className={i !== 0 ? 'mt-6' : ''}
-             >
-               <ArticleCard
-                 title={newsItem.title}
-                 description={newsItem.description}
-                 image={newsItem.image}
-                 publishedAt={newsItem.publishedAt}
-                 onPress={() => router.push(`/articles/${newsItem.id}`)}
-               />
-             </View>
-           ))}
-         </View>
+      <View style={{ width }} className='px-4'>
+        <View className='my-4 flex-col justify-center items-center'>
+          <Text className='text-xl font-rubik-bold text-black-300 capitalize'>
+            {item.id === 'today' ? 'Noticias Destacadas' : item.name}
+          </Text>
         </View>
-      </ScrollView>
+
+        <FlatList
+          data={filteredNews}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 80 }}
+          onEndReachedThreshold={0.5}
+          renderItem={({ item: newsItem, index }) => (
+            <View className={index !== 0 ? 'my-6 border-t border-primary-200' : ''}>
+              <ArticleCard
+                title={newsItem.title}
+                description={newsItem.description}
+                image={newsItem.image}
+                publishedAt={newsItem.publishedAt}
+                onPress={() => router.push(`/articles/${newsItem.id}`)}
+                ranking={item.id === 'top10' ? index + 1 : undefined}
+              />
+            </View>
+          )}
+          ListFooterComponent={
+            isLoadingMore ? (
+              <View className='mt-4 mb-4'>
+                <ActivityIndicator size='small' className='text-primary-300' />
+              </View>
+            ) : null
+          }
+        />
+      </View>
     )
   }
 
@@ -174,13 +223,16 @@ export default function Index() {
 
           {/* barra de búsqueda*/}
           <View className='mt-2'>
-            <Search />
+            <Search
+              onPress={() => router.push('/explore')}
+            />
           </View>
 
           <View className='mt-4'>
             <TopTab
               tabs={navTabs}
               onTabPress={handleTabPress}
+              activeId={currentCategory}
             />
           </View>
         </View>

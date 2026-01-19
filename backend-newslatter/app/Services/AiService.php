@@ -19,7 +19,7 @@ class AiService
         1. Generar un titulo atractivo y persuasivo, con clickbait que de verdad capte la atención.
         2. Redacta una descripción del articulo, esta se le enviara a los suscriptores por correo para dar un avance del contenido.
         3. Escribe el contenido completo.
-        4. Asigna un puntaje de relevancia del 1 a 10, según el impacto informativo que pueda tener la noticia.
+        4. Asigna un puntaje de relevancia del 1 a 10, según la relevancia informativa que pueda tener la noticia, para la toma de decisiones.
         5. Manten un tono periodístico profesional, claro y neutro.
         6. Importante: Devuelve SOLO un JSON con formato:
             {

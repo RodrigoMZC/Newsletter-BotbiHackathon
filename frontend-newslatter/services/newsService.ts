@@ -14,13 +14,17 @@ let  cache: Article[] = [];
 
 export const NewsService = {
 
-  getAll: async (): Promise<Article[]> => {
+  getAll: async (page: number = 1, search: string = ''): Promise<Article[]> => {
     try {
-      const response = await fetch(`${API_URL}/news`, {
+      let url = `${API_URL}/news?page=${page}`;
+
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application.json'
+          'Content-Type': 'application/json'
         }
       })
 
@@ -28,8 +32,17 @@ export const NewsService = {
 
       const json = await response.json();
 
-      cache = json;
-      return json
+      const articles = json.data || json;
+
+      if (search) return articles;
+
+      if (page === 1) {
+        cache = articles
+      } else {
+        cache = [...cache, ...articles]
+      }
+
+      return articles
 
     } catch (e) {
       console.error('Error: ', e)
@@ -61,6 +74,20 @@ export const NewsService = {
     } catch (e) {
       console.error('Error en refetch')
       return []
+    }
+  },
+
+  getTopTen: async (): Promise<Article[]> => {
+    try {
+      // Ajusta la URL según tu ruta de Laravel
+      const response = await fetch(`${API_URL}/news/top`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!response.ok) throw new Error('Error fetching top 10');
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   }
 }

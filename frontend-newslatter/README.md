@@ -1,50 +1,180 @@
-# Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+# News & Markets Aggregator App
 
-1. Install dependencies
+Una aplicación móvil moderna para la agregación de noticias y seguimiento de mercados financieros en tiempo real. Construida con una arquitectura robusta que separa el Frontend en React Native (Expo) y el Backend en Laravel API.
 
-   ```bash
-   npm install
-   ```
+## Características Principales
 
-2. Start the app
+### Noticias (News Feed)
 
-   ```bash
-   npx expo start
-   ```
+* **Top 10 Diario:** Sección destacada con las 10 noticias más importantes del día, visualizadas con un ranking numérico.
+* **Categorías Dinámicas:** Navegación fluida entre pestañas (Tecnología, Negocios, General).
+* **Infinite Scroll:** Carga ilimitada de noticias con paginación optimizada.
+* **Detalle de Artículo:** Vista completa de la noticia con imágenes y descripción.
 
-In the output, you'll find options to open the app in a
+### Mercados (Financial Markets)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+* **Datos en Tiempo Real:** Precios actualizados de Acciones (Stocks) y Criptomonedas.
+* **Indicadores Visuales:** Colores dinámicos (Verde/Rojo) según la variación del precio.
+* **Top Tab Navigation:** Deslizamiento suave (Swipe) entre Acciones y Cripto con sincronización de pestañas.
+* **Smart Caching:** Sistema de caché en Backend (Redis/File) para evitar límites de API y mejorar la velocidad.
+* *Acciones:* Alpha Vantage API (Cache: 60 min).
+* *Cripto:* CoinGecko API (Cache: 10 min).
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+* **Fallback System:** Sistema de respaldo que muestra datos offline si las APIs externas fallan.
 
-When you're ready, run:
+### UI/UX
+
+* **Diseño Moderno:** Estilizado con NativeWind (Tailwind CSS).
+* **Navegación:** Expo Router v3 con Bottom Tabs y Stack Navigation.
+
+---
+
+## Tech Stack
+
+### Frontend (Mobile)
+
+* **Framework:** React Native (Expo SDK)
+* **Lenguaje:** TypeScript
+* **Estilos:** NativeWind (Tailwind CSS)
+* **Navegación:** Expo Router
+* **Iconos:** Tabler Icons / Ionicons
+
+### Backend (API)
+
+* **Framework:** Laravel 12
+* **Lenguaje:** PHP 8.4+
+* **Base de Datos:** MySQL
+* **Http Client:** Guzzle (Laravel Http Wrapper)
+* **Cache:** File / Redis
+
+---
+
+## 🚀 Instalación y Configuración
+
+Sigue estos pasos para levantar el proyecto en tu entorno local.
+
+### Prerrequisitos
+
+* Node.js (v24+)
+* PHP (v8.4) y Composer
+* MySQL
+* Expo Go en tu celular o Simulador (iOS/Android)
+
+### 1. Configuración del Backend (Laravel)
 
 ```bash
-npm run reset-project
+# 1. Clona el repositorio y ve a la carpeta del backend
+cd backend-newsletter
+
+# 2. Instala dependencias de PHP
+composer install
+
+# 3. Copia el archivo de entorno
+cp .env.example .env
+
+# 4. Genera la llave de la aplicación
+php artisan key:generate
+
+# 5. Configura tu base de datos en el archivo .env
+# DB_DATABASE=tu_base_de_datos
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# 6. Ejecuta las migraciones
+php artisan migrate
+
+# 7. Levanta el servidor
+php artisan serve
+
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Configuración de APIs Externas (Backend)
 
-## Learn more
+Para que la sección de Mercados funcione, necesitas obtener API Keys gratuitas y agregarlas a tu archivo `.env` en Laravel:
 
-To learn more about developing your project with Expo, look at the following resources:
+| Servicio | Variable `.env` | Obtener Key |
+| --- | --- | --- |
+| **Alpha Vantage** | `ALPHA_VANTAGE_KEY` | [Link](https://www.google.com/search?q=https://www.alphavantage.co/support/%23api-key) |
+| **CoinGecko** | `COINGECKO_API_KEY` | [Link](https://www.coingecko.com/en/api) |
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```env
+# Ejemplo en tu .env
+ALPHA_VANTAGE_KEY=W8S7xxxxxxxx
+COINGECKO_API_KEY=CG-xxxxxxxxxxxx
 
-## Join the community
+```
 
-Join our community of developers creating universal apps.
+> **Nota:** Después de editar el `.env`, recuerda reiniciar el servidor (`Ctrl+C` y `php artisan serve`) y limpiar caché con `php artisan cache:clear`.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+### 3. Configuración del Frontend (React Native)
+
+```bash
+# 1. Ve a la carpeta del frontend
+cd frontend-app
+
+# 2. Instala dependencias
+npm install
+
+# 3. Configura la URL de tu API
+# Crea un archivo .env en la raíz del frontend
+
+```
+
+**Archivo `.env` (Frontend):**
+Cambia la IP por la de tu máquina local (no uses localhost si pruebas en celular físico).
+
+```env
+EXPO_PUBLIC_API_URL=http://192.168.1.XX:8000/api
+
+```
+
+```bash
+# 4. Inicia la aplicación
+npx expo start
+
+```
+
+---
+
+## Documentación de API (Interna)
+
+El backend expone los siguientes endpoints principales:
+
+### Mercados
+
+* `GET /api/markets?type=stocks` - Obtiene Top 10 Acciones (con caché de 1h).
+* `GET /api/markets?type=crypto` - Obtiene Top 10 Criptomonedas (con caché de 10m).
+
+### Noticias
+
+* `GET /api/news` - Obtiene noticias generales paginadas.
+* `GET /api/news/top` - Obtiene el Top 10 de noticias más importantes del día.
+
+---
+
+## Estructura del Proyecto (Frontend)
+
+```
+app/
+├── (tabs)/
+│   ├── index.tsx       # Home (Noticias)
+│   ├── markets.tsx     # Mercados (Stocks/Crypto)
+│   ├── explore.tsx     # Búsqueda
+│   └── profile.tsx     # Perfil Usuario
+├── _layout.tsx         # Root Layout
+components/
+├── ArticleCard.tsx     # Tarjeta de noticia (con soporte de ranking)
+├── MarketRow.tsx       # Fila de mercado (con indicador verde/rojo)
+├── TopTab.tsx          # Componente de pestañas superior reutilizable
+services/
+├── marketService.ts    # Conexión con Laravel para Mercados
+├── newsService.ts      # Conexión con Laravel para Noticias
+constants/
+└── icons.ts            # Mapeo de iconos
+
+```

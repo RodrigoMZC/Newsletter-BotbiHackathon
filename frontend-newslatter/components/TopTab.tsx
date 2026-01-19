@@ -10,6 +10,7 @@ export interface TabItem {
 interface Props {
   tabs: TabItem[];
   onTabPress?: (tabId: string) => void;
+  activeId?: string;
 }
 
 interface TabButtonProps {
@@ -19,9 +20,12 @@ interface TabButtonProps {
 }
 
 
-const TopTab = ({ tabs, onTabPress }: Props) => {
+const TopTab = ({ tabs, onTabPress, activeId }: Props) => {
+  const { category } = useLocalSearchParams();
   const params = useLocalSearchParams();
   const activeCategory = params.category || 'today';
+
+  const currentTab = activeId || (category as string) || tabs[0]?.id;
 
   const handlePress = (tabId: string) => {
     if (onTabPress) onTabPress(tabId);
@@ -35,7 +39,7 @@ const TopTab = ({ tabs, onTabPress }: Props) => {
         className='flex-row'
       >
         {tabs.map((tab) => {
-          const isActive = activeCategory === tab.id;
+          const isActive = currentTab === tab.id;
 
           return (
             <TouchableOpacity

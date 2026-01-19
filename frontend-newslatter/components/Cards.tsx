@@ -9,6 +9,7 @@ interface Props {
   description: string,
   publishedAt: string,
   image?: any
+  ranking?: number
 }
 
 export const FeaturedCard = ({ onPress }: Props) => {
@@ -74,13 +75,19 @@ export const Card = ({ onPress }: Props) => {
   )
 }
 
-export const ArticleCard = ({onPress, title, description, image, publishedAt}: Props) => {
+export const ArticleCard = ({onPress, title, description, image, publishedAt, ranking}: Props) => {
   return (
     <TouchableOpacity
       onPress={onPress}
       className='flex flex-col w-full border-black-100'
       activeOpacity={0.8}
     >
+      {ranking && (
+        <View className="absolute -top-3 -left-2 z-10 bg-primary-300 size-8 rounded-full items-center justify-center border-2 border-white shadow-sm">
+          <Text className="text-white font-rubik-bold text-sm">#{ranking}</Text>
+        </View>
+      )}
+
       <View className='flex flex-col items-center'>
         <Text
           className='text-base font-rubik-bold text-black-300 mb-4'
